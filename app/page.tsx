@@ -388,13 +388,14 @@ export default function HomePage() {
                 className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
                 disabled={loading || (usdExchangeRate === null && binanceSellExchangeRate === null)}
               />
-              <p className="text-base mt-2 mb-1">Equivalente en Bs (BCV):</p>
+              <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
               <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"}
+                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
               </p>
-              <p className="text-base mt-2 mb-1">Equivalente en Bs (Binance):</p>
+              <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
               <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}
+                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}{" "}
+                Bs
               </p>
               <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
               <p className="text-3xl font-extrabold">
@@ -429,12 +430,12 @@ export default function HomePage() {
                   loading || (usdExchangeRate === null && eurExchangeRate === null && binanceBuyExchangeRate === null)
                 }
               />
-              <p className="text-base mt-2 mb-1">Equivalente en $ (BCV):</p>
-              <p className="text-3xl font-extrabold">{usdFromBs}</p>
-              <p className="text-base mt-2 mb-1">Equivalente en $ (Binance):</p>
-              <p className="text-3xl font-extrabold">{binanceUsdFromBs}</p>
-              <p className="text-base mt-2 mb-1">Equivalente en €:</p>
-              <p className="text-3xl font-extrabold">{eurFromBs}</p>
+              <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
+              <p className="text-3xl font-extrabold">${usdFromBs}</p>
+              <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
+              <p className="text-3xl font-extrabold">${binanceUsdFromBs}</p>
+              <p className="text-base mt-2 mb-1">Equivalente:</p>
+              <p className="text-3xl font-extrabold">€{eurFromBs}</p>
             </CardContent>
           </Card>
         </div>
