@@ -301,13 +301,13 @@ export default function HomePage() {
                   <div className="mb-2">
                     <p className="text-base mb-0.5">1 USD es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
-                      {usdExchangeRate !== null ? usdExchangeRate.toFixed(2).replace(".", ",") : "N/A"} Bs
+                      {usdExchangeRate !== null ? usdExchangeRate.toFixed(4).replace(".", ",") : "N/A"} Bs
                     </p>
                   </div>
                   <div>
                     <p className="text-base mb-0.5">1 EUR es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
-                      {eurExchangeRate !== null ? eurExchangeRate.toFixed(2).replace(".", ",") : "N/A"} Bs
+                      {eurExchangeRate !== null ? eurExchangeRate.toFixed(4).replace(".", ",") : "N/A"} Bs
                     </p>
                   </div>
                 </>
@@ -348,7 +348,7 @@ export default function HomePage() {
                   <div className="mb-2">
                     <p className="text-base mb-0.5">1 USDT (Venta) es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
-                      {binanceSellExchangeRate !== null ? binanceSellExchangeRate.toFixed(2).replace(".", ",") : "N/A"}{" "}
+                      {binanceSellExchangeRate !== null ? binanceSellExchangeRate.toFixed(4).replace(".", ",") : "N/A"}{" "}
                       Bs
                     </p>
                   </div>
@@ -356,7 +356,7 @@ export default function HomePage() {
                   <div>
                     <p className="text-base mb-0.5">1 USDT (Compra) es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
-                      {binanceBuyExchangeRate !== null ? binanceBuyExchangeRate.toFixed(2).replace(".", ",") : "N/A"} Bs
+                      {binanceBuyExchangeRate !== null ? binanceBuyExchangeRate.toFixed(4).replace(".", ",") : "N/A"} Bs
                     </p>
                   </div>
                 </>
@@ -390,11 +390,11 @@ export default function HomePage() {
               />
               <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
               <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
+                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(4).replace(".", ",") : "0,00"} Bs
               </p>
               <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
               <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}{" "}
+                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(4).replace(".", ",") : "0,00"}{" "}
                 Bs
               </p>
               <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
