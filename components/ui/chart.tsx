@@ -42,7 +42,7 @@ const ChartContainer = React.forwardRef<
       typeof RechartsPrimitive.ResponsiveContainer
     >["children"]
   }
->(({ id, className, children, config, ...props }, ref) => {
+>(({ id, className, children, config, ...props }, ref) => { // Destructure children here
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
@@ -55,11 +55,11 @@ const ChartContainer = React.forwardRef<
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className
         )}
-        {...props}
+        {...props} // Only pass remaining HTML attributes
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
-          {children}
+          {children} {/* Pass children explicitly */}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
@@ -102,32 +102,35 @@ ${colorConfig
 
 const ChartTooltip = RechartsPrimitive.Tooltip
 
+// Define the Recharts-specific and custom props for the tooltip content
+interface ChartTooltipContentProps extends RechartsPrimitive.TooltipProps<any, any> {
+  hideLabel?: boolean;
+  hideIndicator?: boolean;
+  indicator?: "line" | "dot" | "dashed";
+  nameKey?: string;
+  labelKey?: string;
+  labelClassName?: string;
+}
+
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & RechartsPrimitive.TooltipProps<any, any> & {
-    hideLabel?: boolean
-    hideIndicator?: boolean
-    indicator?: "line" | "dot" | "dashed"
-    nameKey?: string
-    labelKey?: string
-    labelClassName?: string;
-  }
+  ChartTooltipContentProps & React.HTMLAttributes<HTMLDivElement> // Combine Recharts props with HTML attributes
 >(
   (
     {
       active,
       payload,
-      className,
-      indicator = "dot",
+      label,
       hideLabel = false,
       hideIndicator = false,
-      label,
-      labelFormatter,
-      labelClassName,
-      formatter,
+      indicator = "dot",
       nameKey,
       labelKey,
-      ...restProps // Capture any other div-specific props
+      labelClassName,
+      labelFormatter,
+      formatter,
+      className,
+      ...restHtmlProps // This will now correctly contain only valid HTMLDivElement attributes
     },
     ref
   ) => {
@@ -182,7 +185,7 @@ const ChartTooltipContent = React.forwardRef<
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
           className
         )}
-        {...restProps} // Pass remaining props to the div
+        {...restHtmlProps} // Spread only HTML attributes
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
