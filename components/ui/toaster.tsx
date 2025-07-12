@@ -3,7 +3,7 @@
 import { useToast } from "@/hooks/use-toast"
 import {
   Toast,
-  ToastClose,
+  ToastClose, // Now correctly imported
   ToastDescription,
   ToastProvider,
   ToastTitle,
@@ -24,7 +24,7 @@ export function Toaster() {
                 <ToastDescription>{description}</ToastDescription>
               )}
             </div>
-            {action}
+            {action} {/* action is now React.ReactNode */}
             <ToastClose />
           </Toast>
         )
