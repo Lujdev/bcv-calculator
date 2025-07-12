@@ -301,13 +301,13 @@ export default function HomePage() {
                   <div className="mb-2">
                     <p className="text-base mb-0.5">1 USD es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
-                      {usdExchangeRate !== null ? usdExchangeRate.toFixed(2).replace(".", ",") : "N/A"} VES
+                      {usdExchangeRate !== null ? usdExchangeRate.toFixed(2).replace(".", ",") : "N/A"} Bs
                     </p>
                   </div>
                   <div>
                     <p className="text-base mb-0.5">1 EUR es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
-                      {eurExchangeRate !== null ? eurExchangeRate.toFixed(2).replace(".", ",") : "N/A"} VES
+                      {eurExchangeRate !== null ? eurExchangeRate.toFixed(2).replace(".", ",") : "N/A"} Bs
                     </p>
                   </div>
                 </>
@@ -349,15 +349,14 @@ export default function HomePage() {
                     <p className="text-base mb-0.5">1 USDT (Venta) es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
                       {binanceSellExchangeRate !== null ? binanceSellExchangeRate.toFixed(2).replace(".", ",") : "N/A"}{" "}
-                      VES
+                      Bs
                     </p>
                   </div>
                   {/* Tasa de Compra */}
                   <div>
                     <p className="text-base mb-0.5">1 USDT (Compra) es equivalente a:</p>
                     <p className="text-3xl font-extrabold">
-                      {binanceBuyExchangeRate !== null ? binanceBuyExchangeRate.toFixed(2).replace(".", ",") : "N/A"}{" "}
-                      VES
+                      {binanceBuyExchangeRate !== null ? binanceBuyExchangeRate.toFixed(2).replace(".", ",") : "N/A"} Bs
                     </p>
                   </div>
                 </>
@@ -374,7 +373,7 @@ export default function HomePage() {
           {/* Calculadora USD a VES Card */}
           <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
             <CardHeader className="p-0 pb-3">
-              <CardTitle className="text-xl font-bold">Calculadora (USD a VES)</CardTitle>
+              <CardTitle className="text-xl font-bold">Calculadora (USD a Bs)</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center p-0">
               <Label htmlFor="usd-input" className="text-base mb-1">
@@ -397,7 +396,7 @@ export default function HomePage() {
               <p className="text-3xl font-extrabold">
                 {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}
               </p>
-              <p className="text-base mt-2 mb-1">Diferencia (VES):</p>
+              <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
               <p className="text-3xl font-extrabold">
                 {absoluteDifferenceBetweenRates !== null
                   ? absoluteDifferenceBetweenRates.toFixed(2).replace(".", ",")
