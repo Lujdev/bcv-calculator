@@ -215,6 +215,14 @@ export default function HomePage() {
     return (parsedBs / eurExchangeRate).toFixed(2).replace(".", ",")
   }, [bsAmount, eurExchangeRate])
 
+  const binanceUsdFromBs = useMemo(() => {
+    const parsedBs = Number.parseFloat(bsAmount)
+    if (isNaN(parsedBs) || binanceExchangeRate === null || binanceExchangeRate === 0) {
+      return "0,00"
+    }
+    return (parsedBs / binanceExchangeRate).toFixed(2).replace(".", ",")
+  }, [bsAmount, binanceExchangeRate])
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       {/* Título H1 centrado */}
@@ -319,7 +327,7 @@ export default function HomePage() {
               <p className="text-3xl font-extrabold">
                 {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}
               </p>
-              <p className="text-base mt-2 mb-1">Diferencia (Valor Absoluto):</p>
+              <p className="text-base mt-2 mb-1">Diferencia:</p>
               <p className="text-3xl font-extrabold">
                 {absoluteDifferenceBetweenRates !== null
                   ? absoluteDifferenceBetweenRates.toFixed(2).replace(".", ",")
@@ -331,7 +339,7 @@ export default function HomePage() {
           {/* Calculadora Inversa (VES a USD/EUR) Card */}
           <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
             <CardHeader className="p-0 pb-3">
-              <CardTitle className="text-xl font-bold">Calculadora Inversa (VES)</CardTitle>
+              <CardTitle className="text-xl font-bold">Calculadora de Bs a Divisas</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center p-0">
               <Label htmlFor="bs-input" className="text-base mb-1">
@@ -344,11 +352,13 @@ export default function HomePage() {
                 value={bsAmount}
                 onChange={(e) => setBsAmount(e.target.value)}
                 className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
-                disabled={loading || (usdExchangeRate === null && eurExchangeRate === null)}
+                disabled={loading || (usdExchangeRate === null && eurExchangeRate === null && binanceExchangeRate === null)}
               />
-              <p className="text-base mt-2 mb-1">equivalente en Dólares:</p>
+              <p className="text-base mt-2 mb-1">Equivalente en Dólares (BCV):</p>
               <p className="text-3xl font-extrabold">{usdFromBs}</p>
-              <p className="text-base mt-2 mb-1">equivalente en Euros:</p>
+              <p className="text-base mt-2 mb-1">Equivalente en Dólares (Binance):</p>
+              <p className="text-3xl font-extrabold">{binanceUsdFromBs}</p>
+              <p className="text-base mt-2 mb-1">Equivalente en Euros:</p>
               <p className="text-3xl font-extrabold">{eurFromBs}</p>
             </CardContent>
           </Card>

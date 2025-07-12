@@ -77,4 +77,6 @@ type ToastProps = React.ComponentPropsWithoutRef<typeof Toast>
 
 type ToastActionElement = React.ElementRef<typeof ToastPrimitives.Action>
 
-export { type ToastProps, type ToastActionElement, ToastProvider, ToastViewport, Toast, ToastTitle, ToastDescription }
+const ToastClose = ToastPrimitives.Close; // Define ToastClose as a variable
+
+export { type ToastProps, type ToastActionElement, ToastProvider, ToastViewport, Toast, ToastTitle, ToastDescription, ToastClose }
