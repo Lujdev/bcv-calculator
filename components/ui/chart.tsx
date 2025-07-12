@@ -104,13 +104,13 @@ const ChartTooltip = RechartsPrimitive.Tooltip
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<"div"> & RechartsPrimitive.TooltipProps<any, any> & {
+  React.HTMLAttributes<HTMLDivElement> & RechartsPrimitive.TooltipProps<any, any> & {
     hideLabel?: boolean
     hideIndicator?: boolean
     indicator?: "line" | "dot" | "dashed"
     nameKey?: string
     labelKey?: string
-    labelClassName?: string; // Added labelClassName here
+    labelClassName?: string;
   }
 >(
   (
@@ -125,9 +125,9 @@ const ChartTooltipContent = React.forwardRef<
       labelFormatter,
       labelClassName,
       formatter,
-      color,
       nameKey,
       labelKey,
+      ...restProps // Capture any other div-specific props
     },
     ref
   ) => {
@@ -182,13 +182,14 @@ const ChartTooltipContent = React.forwardRef<
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
           className
         )}
+        {...restProps} // Pass remaining props to the div
       >
         {!nestLabel ? tooltipLabel : null}
         <div className="grid gap-1.5">
           {payload.map((item: any, index: number) => { // Explicitly type item and index
             const key = `${nameKey || item.name || item.dataKey || "value"}`
             const itemConfig = getPayloadConfigFromPayload(config, item, key)
-            const indicatorColor = color || item.payload?.fill || item.payload?.color // Access payload properties
+            const indicatorColor = item.payload?.fill || item.payload?.color // Access payload properties
 
             return (
               <div
@@ -261,7 +262,7 @@ const ChartLegend = RechartsPrimitive.Legend
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
-    payload?: RechartsPrimitive.LegendPayloadEntry[]
+    payload?: RechartsPrimitive.LegendPayload[]
     verticalAlign?: RechartsPrimitive.LegendProps["verticalAlign"]
     hideIcon?: boolean
     nameKey?: string
