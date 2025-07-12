@@ -54,7 +54,7 @@ export default function HomePage() {
 
   const fetchUsdEurRates = useCallback(async () => {
     try {
-      const usdResponse = await fetch("https://pydolarve.org/api/v2/tipo-cambio?currency=usd&format_date=default")
+      const usdResponse = await fetch("curl 'https://pydolarve.org/api/v2/tipo-cambio?currency=usd&rounded_price=false")
       if (!usdResponse.ok) {
         throw new Error(`HTTP error! status: ${usdResponse.status} for USD`)
       }
@@ -67,7 +67,7 @@ export default function HomePage() {
     }
 
     try {
-      const eurResponse = await fetch("https://pydolarve.org/api/v2/tipo-cambio?currency=eur&format_date=default")
+      const eurResponse = await fetch("curl 'https://pydolarve.org/api/v2/tipo-cambio?currency=eur&rounded_price=false")
       if (!eurResponse.ok) {
         throw new Error(`HTTP error! status: ${eurResponse.status} for EUR`)
       }
