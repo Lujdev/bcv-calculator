@@ -291,7 +291,7 @@ export default function HomePage() {
           {/* Tasas de Cambio (USD y EUR) Card */}
           <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
             <CardHeader className="p-0 pb-3">
-              <CardTitle className="text-xl font-bold">Tasas de Cambio (USD y EUR)</CardTitle>
+              <CardTitle className="text-xl font-bold">Tasas de Cambio BCV (USD y EUR)</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center items-center p-0 text-center">
               {loading ? (
@@ -373,7 +373,7 @@ export default function HomePage() {
           {/* Calculadora USD a VES Card */}
           <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
             <CardHeader className="p-0 pb-3">
-              <CardTitle className="text-xl font-bold">Calculadora (USD a Bs)</CardTitle>
+              <CardTitle className="text-xl font-bold">USD a Bs</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center p-0">
               <Label htmlFor="usd-input" className="text-base mb-1">
@@ -388,11 +388,11 @@ export default function HomePage() {
                 className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
                 disabled={loading || (usdExchangeRate === null && binanceSellExchangeRate === null)}
               />
-              <p className="text-base mt-2 mb-1">Equivalente en Bolívares (BCV):</p>
+              <p className="text-base mt-2 mb-1">Equivalente en Bs (BCV):</p>
               <p className="text-3xl font-extrabold">
                 {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"}
               </p>
-              <p className="text-base mt-2 mb-1">Equivalente en Bolívares (Binance):</p>
+              <p className="text-base mt-2 mb-1">Equivalente en Bs (Binance):</p>
               <p className="text-3xl font-extrabold">
                 {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}
               </p>
@@ -416,7 +416,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center p-0">
               <Label htmlFor="bs-input" className="text-base mb-1">
-                Ingresa el monto en Bolívares:
+                Ingresa el monto en Bs:
               </Label>
               <Input
                 id="bs-input"
@@ -429,11 +429,11 @@ export default function HomePage() {
                   loading || (usdExchangeRate === null && eurExchangeRate === null && binanceBuyExchangeRate === null)
                 }
               />
-              <p className="text-base mt-2 mb-1">Equivalente en Dólares (BCV):</p>
+              <p className="text-base mt-2 mb-1">Equivalente en $ (BCV):</p>
               <p className="text-3xl font-extrabold">{usdFromBs}</p>
-              <p className="text-base mt-2 mb-1">Equivalente en Dólares (Binance):</p>
+              <p className="text-base mt-2 mb-1">Equivalente en $ (Binance):</p>
               <p className="text-3xl font-extrabold">{binanceUsdFromBs}</p>
-              <p className="text-base mt-2 mb-1">Equivalente en Euros:</p>
+              <p className="text-base mt-2 mb-1">Equivalente en €:</p>
               <p className="text-3xl font-extrabold">{eurFromBs}</p>
             </CardContent>
           </Card>
