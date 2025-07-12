@@ -390,11 +390,11 @@ export default function HomePage() {
               />
               <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
               <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(4).replace(".", ",") : "0,00"} Bs
+                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
               </p>
               <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
               <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(4).replace(".", ",") : "0,00"}{" "}
+                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}{" "}
                 Bs
               </p>
               <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
