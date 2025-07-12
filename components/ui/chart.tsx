@@ -38,11 +38,9 @@ const ChartContainer = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> & {
     config: ChartConfig
-    children: React.ComponentProps<
-      typeof RechartsPrimitive.ResponsiveContainer
-    >["children"]
+    children: React.ReactElement // Changed to React.ReactElement
   }
->(({ id, className, children, config, ...props }, ref) => { // Destructure children here
+>(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
@@ -55,11 +53,11 @@ const ChartContainer = React.forwardRef<
           "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
           className
         )}
-        {...props} // Only pass remaining HTML attributes
+        {...props}
       >
         <ChartStyle id={chartId} config={config} />
         <RechartsPrimitive.ResponsiveContainer>
-          {children} {/* Pass children explicitly */}
+          {children}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
     </ChartContext.Provider>
@@ -114,7 +112,7 @@ interface ChartTooltipContentProps extends RechartsPrimitive.TooltipProps<any, a
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  ChartTooltipContentProps & React.HTMLAttributes<HTMLDivElement> // Combine Recharts props with HTML attributes
+  ChartTooltipContentProps & Omit<React.HTMLAttributes<HTMLDivElement>, keyof ChartTooltipContentProps>
 >(
   (
     {
