@@ -1,6 +1,5 @@
 "use client"
-
-import type React from "react"
+import { Label } from "@/components/ui/label" // Import Label component
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,7 +13,11 @@ const BINANCE_COOLDOWN_KEY = "binance_refresh_cooldown_end"
 export default function HomePage() {
   const [usdExchangeRate, setUsdExchangeRate] = useState<number | null>(null)
   const [eurExchangeRate, setEurExchangeRate] = useState<number | null>(null)
-  const [binanceExchangeRate, setBinanceExchangeRate] = useState<number | null>(null)
+  // Renombrado binanceExchangeRate a binanceSellExchangeRate
+  const [binanceSellExchangeRate, setBinanceSellExchangeRate] = useState<number | null>(null)
+  // Nueva variable de estado para la tasa de compra de Binance
+  const [binanceBuyExchangeRate, setBinanceBuyExchangeRate] = useState<number | null>(null)
+
   const [usdEurLastUpdate, setUsdEurLastUpdate] = useState<string>("")
   const [binanceLastUpdate, setBinanceLastUpdate] = useState<string>("")
   const [usdAmount, setUsdAmount] = useState<string>("")
@@ -76,8 +79,8 @@ export default function HomePage() {
     }
   }, [])
 
-  const fetchBinanceRate = useCallback(async (showToast = true) => {
-    setIsBinanceRefreshing(true)
+  // Función para obtener la tasa de VENTA de Binance (tradeType: SELL)
+  const fetchBinanceSellRate = useCallback(async () => {
     try {
       const binanceResponse = await fetch("/api/binance-rate", {
         method: "POST",
@@ -88,10 +91,10 @@ export default function HomePage() {
 
       if (!binanceResponse.ok) {
         const errorData = await binanceResponse.json()
-        throw new Error(errorData.error || `HTTP error! status: ${binanceResponse.status} for Binance`)
+        throw new Error(errorData.error || `HTTP error! status: ${binanceResponse.status} for Binance Sell`)
       }
       const binanceData = await binanceResponse.json()
-      setBinanceExchangeRate(binanceData.price)
+      setBinanceSellExchangeRate(binanceData.price)
 
       const caracasTime = new Date().toLocaleString("es-ES", {
         timeZone: "America/Caracas",
@@ -99,28 +102,34 @@ export default function HomePage() {
         timeStyle: "short",
         hour12: true,
       })
-      setBinanceLastUpdate(caracasTime)
-
-      if (showToast) {
-        toast.success("Tasa de Binance actualizada", {
-          description: `La tasa de Binance se ha actualizado a ${binanceData.price.toFixed(2).replace(".", ",")} VES.`,
-          icon: <CheckCircle2 className="h-5 w-5 text-green-400" />,
-          style: { backgroundColor: "black", color: "white", border: "1px solid black" },
-          descriptionClassName: "text-white",
-        })
-      }
+      setBinanceLastUpdate(caracasTime) // La última actualización puede ser compartida
     } catch (e: any) {
-      console.error("Error fetching Binance exchange rate:", e.message)
-      setBinanceExchangeRate(null)
-      if (showToast) {
-        toast.error("Error al actualizar Binance", {
-          description: e.message || "No se pudo obtener la tasa de Binance.",
-          style: { backgroundColor: "black", color: "white", border: "1px solid black" },
-          descriptionClassName: "text-white",
-        })
+      console.error("Error fetching Binance SELL exchange rate:", e.message)
+      setBinanceSellExchangeRate(null)
+      throw e // Re-throw to be caught by Promise.all
+    }
+  }, [])
+
+  // Función para obtener la tasa de COMPRA de Binance (tradeType: BUY)
+  const fetchBinanceBuyRate = useCallback(async () => {
+    try {
+      const binanceBuyResponse = await fetch("/api/binance-buy-rate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!binanceBuyResponse.ok) {
+        const errorData = await binanceBuyResponse.json()
+        throw new Error(errorData.error || `HTTP error! status: ${binanceBuyResponse.status} for Binance Buy`)
       }
-    } finally {
-      setIsBinanceRefreshing(false)
+      const binanceBuyData = await binanceBuyResponse.json()
+      setBinanceBuyExchangeRate(binanceBuyData.price)
+    } catch (e: any) {
+      console.error("Error fetching Binance BUY exchange rate:", e.message)
+      setBinanceBuyExchangeRate(null)
+      throw e // Re-throw to be caught by Promise.all
     }
   }, [])
 
@@ -128,9 +137,14 @@ export default function HomePage() {
     const initialLoadAndSetupIntervals = async () => {
       setLoading(true)
 
-      await Promise.all([fetchUsdEurRates(), fetchBinanceRate(false)])
-
-      setLoading(false)
+      try {
+        await Promise.all([fetchUsdEurRates(), fetchBinanceSellRate(), fetchBinanceBuyRate()])
+      } catch (error) {
+        console.error("Error during initial data load:", error)
+        // Handle specific errors or show a general error toast if needed
+      } finally {
+        setLoading(false)
+      }
 
       const storedCooldownEnd = localStorage.getItem(BINANCE_COOLDOWN_KEY)
       if (storedCooldownEnd) {
@@ -144,7 +158,24 @@ export default function HomePage() {
       }
 
       usdEurIntervalRef.current = setInterval(fetchUsdEurRates, 3600000)
-      binanceAutoIntervalRef.current = setInterval(() => fetchBinanceRate(true), 3600000)
+      // Actualizar ambas tasas de Binance automáticamente
+      binanceAutoIntervalRef.current = setInterval(async () => {
+        try {
+          await Promise.all([fetchBinanceSellRate(), fetchBinanceBuyRate()])
+          toast.success("Tasas de Binance actualizadas automáticamente", {
+            description: "Las tasas de compra y venta de Binance se han actualizado.",
+            icon: <CheckCircle2 className="h-5 w-5 text-green-400" />,
+            style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+            descriptionClassName: "text-white",
+          })
+        } catch (e: any) {
+          toast.error("Error al actualizar Binance automáticamente", {
+            description: e.message || "No se pudieron obtener las tasas de Binance.",
+            style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+            descriptionClassName: "text-white",
+          })
+        }
+      }, 3600000)
     }
 
     initialLoadAndSetupIntervals()
@@ -160,7 +191,7 @@ export default function HomePage() {
         clearInterval(binanceCooldownIntervalRef.current)
       }
     }
-  }, [fetchUsdEurRates, fetchBinanceRate, startBinanceCooldown])
+  }, [fetchUsdEurRates, fetchBinanceSellRate, fetchBinanceBuyRate, startBinanceCooldown])
 
   const handleBinanceRefresh = async () => {
     if (binanceCooldown > 0) {
@@ -173,7 +204,24 @@ export default function HomePage() {
     }
 
     startBinanceCooldown(60)
-    await fetchBinanceRate(true)
+    setIsBinanceRefreshing(true)
+    try {
+      await Promise.all([fetchBinanceSellRate(), fetchBinanceBuyRate()])
+      toast.success("Tasas de Binance actualizadas", {
+        description: "Las tasas de compra y venta de Binance se han actualizado.",
+        icon: <CheckCircle2 className="h-5 w-5 text-green-400" />,
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
+    } catch (e: any) {
+      toast.error("Error al actualizar Binance", {
+        description: e.message || "No se pudieron obtener las tasas de Binance.",
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
+    } finally {
+      setIsBinanceRefreshing(false)
+    }
   }
 
   const bolivaresEquivalentBCV = useMemo(() => {
@@ -184,13 +232,14 @@ export default function HomePage() {
     return parsedUsd * usdExchangeRate
   }, [usdAmount, usdExchangeRate])
 
+  // Usa la tasa de VENTA de Binance para USD a VES
   const bolivaresEquivalentBinance = useMemo(() => {
     const parsedUsd = Number.parseFloat(usdAmount)
-    if (isNaN(parsedUsd) || binanceExchangeRate === null) {
+    if (isNaN(parsedUsd) || binanceSellExchangeRate === null) {
       return null
     }
-    return parsedUsd * binanceExchangeRate
-  }, [usdAmount, binanceExchangeRate])
+    return parsedUsd * binanceSellExchangeRate
+  }, [usdAmount, binanceSellExchangeRate])
 
   const absoluteDifferenceBetweenRates = useMemo(() => {
     if (bolivaresEquivalentBCV === null || bolivaresEquivalentBinance === null) {
@@ -198,6 +247,14 @@ export default function HomePage() {
     }
     return Math.abs(bolivaresEquivalentBCV - bolivaresEquivalentBinance)
   }, [bolivaresEquivalentBCV, bolivaresEquivalentBinance])
+
+  // Nueva diferencia en USD
+  const differenceInUsd = useMemo(() => {
+    if (absoluteDifferenceBetweenRates === null || usdExchangeRate === null || usdExchangeRate === 0) {
+      return null
+    }
+    return absoluteDifferenceBetweenRates / usdExchangeRate
+  }, [absoluteDifferenceBetweenRates, usdExchangeRate])
 
   const usdFromBs = useMemo(() => {
     const parsedBs = Number.parseFloat(bsAmount)
@@ -215,13 +272,14 @@ export default function HomePage() {
     return (parsedBs / eurExchangeRate).toFixed(2).replace(".", ",")
   }, [bsAmount, eurExchangeRate])
 
+  // Usa la tasa de COMPRA de Binance para Bs a USD
   const binanceUsdFromBs = useMemo(() => {
     const parsedBs = Number.parseFloat(bsAmount)
-    if (isNaN(parsedBs) || binanceExchangeRate === null || binanceExchangeRate === 0) {
+    if (isNaN(parsedBs) || binanceBuyExchangeRate === null || binanceBuyExchangeRate === 0) {
       return "0,00"
     }
-    return (parsedBs / binanceExchangeRate).toFixed(2).replace(".", ",")
-  }, [bsAmount, binanceExchangeRate])
+    return (parsedBs / binanceBuyExchangeRate).toFixed(2).replace(".", ",")
+  }, [bsAmount, binanceBuyExchangeRate])
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
@@ -284,13 +342,25 @@ export default function HomePage() {
             <CardContent className="flex-grow flex flex-col justify-center items-center p-0 text-center">
               {loading ? (
                 <p className="text-base">Cargando...</p>
-              ) : binanceExchangeRate !== null ? (
-                <>
-                  <p className="text-base mb-1">1 USDT es equivalente a:</p>
-                  <p className="text-3xl font-extrabold">{binanceExchangeRate.toFixed(2).replace(".", ",")} VES</p>
-                </>
               ) : (
-                <p className="text-base text-red-300">No disponible</p>
+                <>
+                  {/* Tasa de Venta */}
+                  <div className="mb-2">
+                    <p className="text-base mb-0.5">1 USDT (Venta) es equivalente a:</p>
+                    <p className="text-3xl font-extrabold">
+                      {binanceSellExchangeRate !== null ? binanceSellExchangeRate.toFixed(2).replace(".", ",") : "N/A"}{" "}
+                      VES
+                    </p>
+                  </div>
+                  {/* Tasa de Compra */}
+                  <div>
+                    <p className="text-base mb-0.5">1 USDT (Compra) es equivalente a:</p>
+                    <p className="text-3xl font-extrabold">
+                      {binanceBuyExchangeRate !== null ? binanceBuyExchangeRate.toFixed(2).replace(".", ",") : "N/A"}{" "}
+                      VES
+                    </p>
+                  </div>
+                </>
               )}
             </CardContent>
             <div className="text-xs text-right mt-3">
@@ -317,7 +387,7 @@ export default function HomePage() {
                 value={usdAmount}
                 onChange={(e) => setUsdAmount(e.target.value)}
                 className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
-                disabled={loading || (usdExchangeRate === null && binanceExchangeRate === null)}
+                disabled={loading || (usdExchangeRate === null && binanceSellExchangeRate === null)}
               />
               <p className="text-base mt-2 mb-1">Equivalente en Bolívares (BCV):</p>
               <p className="text-3xl font-extrabold">
@@ -327,11 +397,15 @@ export default function HomePage() {
               <p className="text-3xl font-extrabold">
                 {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}
               </p>
-              <p className="text-base mt-2 mb-1">Diferencia:</p>
+              <p className="text-base mt-2 mb-1">Diferencia (VES):</p>
               <p className="text-3xl font-extrabold">
                 {absoluteDifferenceBetweenRates !== null
                   ? absoluteDifferenceBetweenRates.toFixed(2).replace(".", ",")
                   : "0,00"}
+              </p>
+              <p className="text-base mt-2 mb-1">Diferencia ($):</p>
+              <p className="text-3xl font-extrabold">
+                {differenceInUsd !== null ? differenceInUsd.toFixed(2).replace(".", ",") : "0,00"}
               </p>
             </CardContent>
           </Card>
@@ -352,7 +426,9 @@ export default function HomePage() {
                 value={bsAmount}
                 onChange={(e) => setBsAmount(e.target.value)}
                 className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
-                disabled={loading || (usdExchangeRate === null && eurExchangeRate === null && binanceExchangeRate === null)}
+                disabled={
+                  loading || (usdExchangeRate === null && eurExchangeRate === null && binanceBuyExchangeRate === null)
+                }
               />
               <p className="text-base mt-2 mb-1">Equivalente en Dólares (BCV):</p>
               <p className="text-3xl font-extrabold">{usdFromBs}</p>
@@ -365,13 +441,5 @@ export default function HomePage() {
         </div>
       </div>
     </div>
-  )
-}
-
-function Label({ htmlFor, children, className }: { htmlFor: string; children: React.ReactNode; className?: string }) {
-  return (
-    <label htmlFor={htmlFor} className={className}>
-      {children}
-    </label>
   )
 }

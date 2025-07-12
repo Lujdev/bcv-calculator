@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         periods: [],
         additionalKycVerifyFilter: 0,
         publisherType: "merchant",
-        payTypes: ["SpecificBank"],
+        payTypes: ["PagoMovil"],
         classifies: ["mass", "profession", "fiat_trade"],
         tradedWith: false,
         followed: false,
