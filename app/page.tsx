@@ -403,7 +403,7 @@ export default function HomePage() {
                     <TooltipTrigger asChild>
                       <Info className="h-4 w-4 cursor-help" />
                     </TooltipTrigger>
-                    <TooltipContent className="bg-black text-white border-none">
+                    <TooltipContent className="bg-popover text-popover-foreground border">
                       <p>
                         El precio reflejado incluye la comisión de {BINANCE_COMMISSION_USD.toFixed(3)} USD de Binance.
                       </p>
