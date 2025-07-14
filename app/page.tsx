@@ -34,6 +34,12 @@ export default function HomePage() {
   const usdEurIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const binanceAutoIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
+  const [showBinanceLastUpdate, setShowBinanceLastUpdate] = useState(false);
+
+  useEffect(() => {
+    setShowBinanceLastUpdate(true);
+  }, []);
+
   const startBinanceCooldown = useCallback((duration: number) => {
     const cooldownEndTime = Date.now() + duration * 1000
     localStorage.setItem(BINANCE_COOLDOWN_KEY, cooldownEndTime.toString())
@@ -367,7 +373,9 @@ export default function HomePage() {
               )}
             </CardContent>
             <div className="text-xs text-right mt-3">
-              <p>{binanceLastUpdate ? `Última actualización: ${binanceLastUpdate}` : ""}</p>
+              {showBinanceLastUpdate && binanceLastUpdate ? (
+                <p>{`Última actualización: ${binanceLastUpdate}`}</p>
+              ) : null}
             </div>
           </Card>
         </div>
@@ -377,7 +385,7 @@ export default function HomePage() {
           {/* Calculadora USD a VES Card */}
           <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
             <CardHeader className="p-0 pb-3">
-              <CardTitle className="text-xl font-bold">Calculadora USD a Bs</CardTitle>
+              <CardTitle className="text-xl font-bold">Calculadora USDT a Bs</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center p-0">
               <Label htmlFor="usd-input" className="text-base mb-1">
@@ -463,12 +471,24 @@ export default function HomePage() {
               />
               <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
               <p className="text-3xl font-extrabold">${usdFromBs}</p>
-              <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
+              <p className="text-base mt-2 mb-1">Equivalente (USDT):</p>
               <p className="text-3xl font-extrabold">${binanceUsdFromBs}</p>
               <p className="text-base mt-2 mb-1">Equivalente:</p>
               <p className="text-3xl font-extrabold">€{eurFromBs}</p>
             </CardContent>
           </Card>
+        </div>
+      </div>
+      <div className="w-full max-w-3xl mx-auto mt-12">
+        <div className="flex items-center justify-center bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 shadow-sm">
+          <svg className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" />
+          </svg>
+          <span className="text-sm text-blue-900">
+            Los tipos de cambio son <strong>informativos</strong>. No garantizamos su exactitud. Consulte fuentes oficiales para transacciones.{' '}
+            <a href="/legal" className="underline font-semibold text-blue-700 hover:text-blue-900 transition-colors">[Más info]</a>
+          </span>
         </div>
       </div>
     </div>
