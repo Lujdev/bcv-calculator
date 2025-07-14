@@ -1,30 +1,94 @@
-# BCV_Calculador
+# BCV Calculator
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+<p align="center">
+  <img src="/public/placeholder-logo.svg" alt="BCV Calculator Logo" width="220" />
+</p>
 
+[![Next.js](https://img.shields.io/badge/Built%20with-Next.js-blue?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Styled%20with-Tailwind%20CSS-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/luis-molinas-projects/v0-bcv-calculador)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/v6k4KKy1HWm)
 
-## Overview
+---
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## 📈 ¿Qué es BCV Calculator?
 
-## Deployment
+**BCV Calculator** es una aplicación web moderna construida con Next.js y Tailwind CSS que permite consultar y comparar tasas de cambio USD/BS y EUR/BS en Venezuela, tanto oficiales (BCV) como de mercados secundarios (Binance). Incluye calculadoras rápidas, diferencias entre tasas y un aviso legal detallado.
 
-Your project is live at:
+---
 
-**[https://vercel.com/luis-molinas-projects/v0-bcv-calculador](https://vercel.com/luis-molinas-projects/v0-bcv-calculador)**
+## ✨ Características principales
 
-## Build your app
+- Consulta en tiempo real de tasas oficiales del BCV y tasas de Binance (compra/venta).
+- Calculadora de conversión USD ↔️ BS y BS ↔️ USD/EUR.
+- Diferencia entre tasas oficiales y paralelas.
+- Aviso legal y exención de responsabilidad accesible desde la app.
+- Interfaz responsiva, moderna y accesible.
+- Notificaciones y feedback visual amigable.
 
-Continue building your app on:
+---
 
-**[https://v0.dev/chat/projects/v6k4KKy1HWm](https://v0.dev/chat/projects/v6k4KKy1HWm)**
+## 🚀 Instalación y ejecución local
 
-## How It Works
+1. **Clona el repositorio:**
+   ```bash
+   git clone https://github.com/tu-usuario/bcv-calculator.git
+   cd bcv-calculator
+   ```
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+2. **Instala las dependencias:**
+   ```bash
+   pnpm install
+   # o
+   npm install
+   # o
+   yarn install
+   ```
+
+3. **Ejecuta el servidor de desarrollo:**
+   ```bash
+   pnpm dev
+   # o
+   npm run dev
+   # o
+   yarn dev
+   ```
+
+4. Abre [http://localhost:3000](http://localhost:3000) en tu navegador.
+
+---
+
+## 🗂️ Estructura del proyecto
+
+- `app/` — Páginas principales y rutas API (Next.js App Router)
+  - `page.tsx` — Página principal con calculadoras y tasas
+  - `legal/page.tsx` — Aviso legal y exención de responsabilidad
+  - `api/` — Endpoints para obtener tasas BCV y Binance
+- `components/` — Componentes reutilizables de UI
+- `hooks/` — Custom hooks
+- `lib/` — Utilidades compartidas
+- `public/` — Imágenes y recursos estáticos
+- `styles/` — Estilos globales
+
+---
+
+## 🛠️ Tecnologías principales
+
+- [Next.js 15](https://nextjs.org/)
+- [React 19](https://react.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Radix UI](https://www.radix-ui.com/)
+- [Lucide React Icons](https://lucide.dev/)
+- [Sonner](https://sonner.emilkowal.ski/) (notificaciones)
+
+---
+
+## 📄 Aviso legal
+
+La información de tasas BCV proviene del portal oficial del Banco Central de Venezuela ([https://www.bcv.org.ve/](https://www.bcv.org.ve/)). Las tasas de Binance y otras fuentes son informativas y no oficiales. Consulta el [Aviso Legal](/legal) para más detalles.
+
+---
+
+## 📬 Contacto y soporte
+
+¿Tienes sugerencias, dudas o encontraste un bug? ¡Abre un issue o contacta al autor!
+
