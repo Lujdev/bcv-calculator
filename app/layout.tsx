@@ -7,9 +7,12 @@ import { Toaster } from "@/components/ui/sonner"
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
-  title: "Calculadora Tasa de Cambio", // Título actualizado aquí
+  title: "Calculadora Tasa de Cambio",
   description: "Created with v0",
   generator: "v0.dev",
+  icons: {
+    icon: "/favicon.ico", // Añade esta línea para el favicon
+  },
 }
 
 export default function RootLayout({
