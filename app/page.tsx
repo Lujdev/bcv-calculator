@@ -10,6 +10,9 @@ import { toast } from "sonner"
 
 const BINANCE_COOLDOWN_KEY = "binance_refresh_cooldown_end"
 
+// Define the Binance commission constant
+const BINANCE_COMMISSION_USD = 0.05
+
 export default function HomePage() {
   const [usdExchangeRate, setUsdExchangeRate] = useState<number | null>(null)
   const [eurExchangeRate, setEurExchangeRate] = useState<number | null>(null)
@@ -238,7 +241,9 @@ export default function HomePage() {
     if (isNaN(parsedUsd) || binanceSellExchangeRate === null) {
       return null
     }
-    return parsedUsd * binanceSellExchangeRate
+    // Apply commission: subtract 0.050 USD from the input amount
+    const amountAfterCommission = Math.max(0, parsedUsd - BINANCE_COMMISSION_USD) // Ensure it doesn't go negative
+    return amountAfterCommission * binanceSellExchangeRate
   }, [usdAmount, binanceSellExchangeRate])
 
   const absoluteDifferenceBetweenRates = useMemo(() => {
