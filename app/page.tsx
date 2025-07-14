@@ -1,14 +1,18 @@
 "use client"
 import { Label } from "@/components/ui/label" // Import Label component
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip" // Import Tooltip components
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, CheckCircle2 } from "lucide-react"
+import { RefreshCw, CheckCircle2, Info } from "lucide-react" // Import Info icon
 import { toast } from "sonner"
 
 const BINANCE_COOLDOWN_KEY = "binance_refresh_cooldown_end"
+
+// Define the Binance commission constant
+const BINANCE_COMMISSION_USD = 0.05
 
 export default function HomePage() {
   const [usdExchangeRate, setUsdExchangeRate] = useState<number | null>(null)
@@ -29,6 +33,12 @@ export default function HomePage() {
   const binanceCooldownIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const usdEurIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const binanceAutoIntervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  const [showBinanceLastUpdate, setShowBinanceLastUpdate] = useState(false);
+
+  useEffect(() => {
+    setShowBinanceLastUpdate(true);
+  }, []);
 
   const startBinanceCooldown = useCallback((duration: number) => {
     const cooldownEndTime = Date.now() + duration * 1000
@@ -52,30 +62,27 @@ export default function HomePage() {
     }, 1000)
   }, [])
 
+  // Modificada para usar la nueva API route
   const fetchUsdEurRates = useCallback(async () => {
     try {
-      const usdResponse = await fetch("https://pydolarve.org/api/v2/tipo-cambio?currency=usd&rounded_price=false")
-      if (!usdResponse.ok) {
-        throw new Error(`HTTP error! status: ${usdResponse.status} for USD`)
+      const response = await fetch("/api/bcv-rates")
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status} for BCV rates`)
       }
-      const usdData = await usdResponse.json()
-      setUsdExchangeRate(usdData.price)
-      setUsdEurLastUpdate(usdData.last_update)
-    } catch (e) {
-      console.error("Error fetching USD exchange rate:", e)
+      const data = await response.json()
+      setUsdExchangeRate(data.usdPrice)
+      setEurExchangeRate(data.eurPrice)
+      setUsdEurLastUpdate(data.lastUpdate)
+    } catch (e: any) {
+      console.error("Error fetching USD/EUR exchange rates:", e.message)
       setUsdExchangeRate(null)
-    }
-
-    try {
-      const eurResponse = await fetch("https://pydolarve.org/api/v2/tipo-cambio?currency=eur&rounded_price=false")
-      if (!eurResponse.ok) {
-        throw new Error(`HTTP error! status: ${eurResponse.status} for EUR`)
-      }
-      const eurData = await eurResponse.json()
-      setEurExchangeRate(eurData.price)
-    } catch (e) {
-      console.error("Error fetching EUR exchange rate:", e)
       setEurExchangeRate(null)
+      toast.error("Error al actualizar tasas BCV", {
+        description: e.message || "No se pudieron obtener las tasas del BCV.",
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
     }
   }, [])
 
@@ -157,8 +164,9 @@ export default function HomePage() {
         }
       }
 
+      // Actualizar tasas BCV cada hora
       usdEurIntervalRef.current = setInterval(fetchUsdEurRates, 3600000)
-      // Actualizar ambas tasas de Binance automáticamente
+      // Actualizar ambas tasas de Binance automáticamente cada hora
       binanceAutoIntervalRef.current = setInterval(async () => {
         try {
           await Promise.all([fetchBinanceSellRate(), fetchBinanceBuyRate()])
@@ -238,7 +246,9 @@ export default function HomePage() {
     if (isNaN(parsedUsd) || binanceSellExchangeRate === null) {
       return null
     }
-    return parsedUsd * binanceSellExchangeRate
+    // Apply commission: subtract 0.050 USD from the input amount
+    const amountAfterCommission = Math.max(0, parsedUsd - BINANCE_COMMISSION_USD) // Ensure it doesn't go negative
+    return amountAfterCommission * binanceSellExchangeRate
   }, [usdAmount, binanceSellExchangeRate])
 
   const absoluteDifferenceBetweenRates = useMemo(() => {
@@ -363,7 +373,9 @@ export default function HomePage() {
               )}
             </CardContent>
             <div className="text-xs text-right mt-3">
-              <p>{binanceLastUpdate ? `Última actualización: ${binanceLastUpdate}` : ""}</p>
+              {showBinanceLastUpdate && binanceLastUpdate ? (
+                <p>{`Última actualización: ${binanceLastUpdate}`}</p>
+              ) : null}
             </div>
           </Card>
         </div>
@@ -373,7 +385,7 @@ export default function HomePage() {
           {/* Calculadora USD a VES Card */}
           <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
             <CardHeader className="p-0 pb-3">
-              <CardTitle className="text-xl font-bold">Calculadora USD a Bs</CardTitle>
+              <CardTitle className="text-xl font-bold">Calculadora USDT a Bs</CardTitle>
             </CardHeader>
             <CardContent className="flex-grow flex flex-col justify-center p-0">
               <Label htmlFor="usd-input" className="text-base mb-1">
@@ -388,25 +400,52 @@ export default function HomePage() {
                 className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
                 disabled={loading || (usdExchangeRate === null && binanceSellExchangeRate === null)}
               />
-              <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
-              <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
-              </p>
-              <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
-              <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}{" "}
-                Bs
-              </p>
-              <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
-              <p className="text-3xl font-extrabold">
-                {absoluteDifferenceBetweenRates !== null
-                  ? absoluteDifferenceBetweenRates.toFixed(2).replace(".", ",")
-                  : "0,00"}
-              </p>
-              <p className="text-base mt-2 mb-1">Diferencia ($):</p>
-              <p className="text-3xl font-extrabold">
-                {differenceInUsd !== null ? differenceInUsd.toFixed(2).replace(".", ",") : "0,00"}
-              </p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
+                <div>
+                  <p className="text-base mb-1">Equivalente (BCV):</p>
+                  <p className="text-3xl font-extrabold">
+                    {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
+                  </p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1 text-base mb-1">
+                    <p>Equivalente (Binance):</p>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-popover text-popover-foreground border">
+                          <p>
+                            El precio reflejado incluye la comisión de {BINANCE_COMMISSION_USD.toFixed(3)} USD de
+                            Binance.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <p className="text-3xl font-extrabold">
+                    {bolivaresEquivalentBinance !== null
+                      ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",")
+                      : "0,00"}{" "}
+                    Bs
+                  </p>
+                </div>
+                <div>
+                  <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
+                  <p className="text-3xl font-extrabold">
+                    {absoluteDifferenceBetweenRates !== null
+                      ? absoluteDifferenceBetweenRates.toFixed(2).replace(".", ",")
+                      : "0,00"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-base mt-2 mb-1">Diferencia ($):</p>
+                  <p className="text-3xl font-extrabold">
+                    {differenceInUsd !== null ? differenceInUsd.toFixed(2).replace(".", ",") : "0,00"}
+                  </p>
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -432,12 +471,24 @@ export default function HomePage() {
               />
               <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
               <p className="text-3xl font-extrabold">${usdFromBs}</p>
-              <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
+              <p className="text-base mt-2 mb-1">Equivalente (USDT):</p>
               <p className="text-3xl font-extrabold">${binanceUsdFromBs}</p>
               <p className="text-base mt-2 mb-1">Equivalente:</p>
               <p className="text-3xl font-extrabold">€{eurFromBs}</p>
             </CardContent>
           </Card>
+        </div>
+      </div>
+      <div className="w-full max-w-3xl mx-auto mt-12">
+        <div className="flex items-center justify-center bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 shadow-sm">
+          <svg className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="white"/>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" />
+          </svg>
+          <span className="text-sm text-blue-900">
+            Los tipos de cambio son <strong>informativos</strong>. No garantizamos su exactitud. Consulte fuentes oficiales para transacciones.{' '}
+            <a href="/legal" className="underline font-semibold text-blue-700 hover:text-blue-900 transition-colors">[Más info]</a>
+          </span>
         </div>
       </div>
     </div>
