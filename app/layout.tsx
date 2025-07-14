@@ -8,8 +8,8 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
 
 export const metadata: Metadata = {
   title: "Calculadora Tasa de Cambio",
-  description: "Created with v0",
-  generator: "v0.dev",
+  description: "Calculadora de Divisas",
+  generator: "",
   icons: {
     icon: "/favicon.ico", // Añade esta línea para el favicon
   },
