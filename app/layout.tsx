@@ -27,8 +27,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={poppins.variable}>
-      {" "}
-      {/* Usando la variable de Poppins */}
       <body>
         {children}
         <Toaster position="bottom-right" theme="dark" />
