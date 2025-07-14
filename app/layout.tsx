@@ -1,14 +1,14 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Poppins } from "next/font/google" // Cambiado de Inter a Poppins
+import { JetBrains_Mono } from "next/font/google" // Cambiado de Poppins a JetBrains Mono
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 
-// Configuración de la fuente Poppins
-const poppins = Poppins({
+// Configuración de la fuente JetBrains Mono
+const jetBrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400", "700"], // Puedes ajustar los pesos según necesites
-  variable: "--font-poppins",
+  variable: "--font-jetbrains-mono", // Nueva variable para JetBrains Mono
 })
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={poppins.variable}>
+    <html lang="en" className={jetBrainsMono.variable}>
       <body>
         {children}
         <Toaster position="bottom-right" theme="dark" />

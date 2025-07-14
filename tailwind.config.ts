@@ -77,7 +77,7 @@ const config = {
         "accordion-up": "accordion-up 0.2s ease-out",
       },
       fontFamily: {
-        sans: ["var(--font-poppins)"], // Cambiado de Inter a Poppins
+        sans: ["var(--font-jetbrains-mono)"], // Cambiado de Poppins a JetBrains Mono
       },
     },
   },
