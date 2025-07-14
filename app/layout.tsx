@@ -1,10 +1,15 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { Poppins } from "next/font/google" // Cambiado de Inter a Poppins
 import "./globals.css"
 import { Toaster } from "@/components/ui/sonner"
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" })
+// Configuración de la fuente Poppins
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "700"], // Puedes ajustar los pesos según necesites
+  variable: "--font-poppins",
+})
 
 export const metadata: Metadata = {
   title: "Calculadora Tasa de Cambio",
@@ -21,7 +26,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={poppins.variable}>
+      {" "}
+      {/* Usando la variable de Poppins */}
       <body>
         {children}
         <Toaster position="bottom-right" theme="dark" />
