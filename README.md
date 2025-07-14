@@ -1,9 +1,5 @@
 # BCV Calculator
 
-<p align="center">
-  <img src="/public/placeholder-logo.svg" alt="BCV Calculator Logo" width="220" />
-</p>
-
 [![Next.js](https://img.shields.io/badge/Built%20with-Next.js-blue?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Styled%20with-Tailwind%20CSS-38BDF8?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/luis-molinas-projects/v0-bcv-calculador)
@@ -12,15 +8,15 @@
 
 ## 📈 ¿Qué es BCV Calculator?
 
-**BCV Calculator** es una aplicación web moderna construida con Next.js y Tailwind CSS que permite consultar y comparar tasas de cambio USD/BS y EUR/BS en Venezuela, tanto oficiales (BCV) como de mercados secundarios (Binance). Incluye calculadoras rápidas, diferencias entre tasas y un aviso legal detallado.
+**BCV Calculator** es una aplicación web moderna construida con Next.js y Tailwind CSS que permite consultar y comparar tasas de cambio USD/BS y EUR/BS en Venezuela, tanto oficiales (BCV) como de mercados secundarios (Binance) por USDT. Incluye calculadoras rápidas, diferencias entre tasas y un aviso legal detallado.
 
 ---
 
 ## ✨ Características principales
 
-- Consulta en tiempo real de tasas oficiales del BCV y tasas de Binance (compra/venta).
-- Calculadora de conversión USD ↔️ BS y BS ↔️ USD/EUR.
-- Diferencia entre tasas oficiales y paralelas.
+- Consulta en tiempo real de tasas oficiales del BCV y tasas de Binance por USDT (compra/venta).
+- Calculadora de conversión USD ↔️ BS y BS ↔️ USD/EUR/USDT.
+- Diferencia entre tasas oficiales y el USDT de Binance.
 - Aviso legal y exención de responsabilidad accesible desde la app.
 - Interfaz responsiva, moderna y accesible.
 - Notificaciones y feedback visual amigable.
@@ -84,7 +80,7 @@
 
 ## 📄 Aviso legal
 
-La información de tasas BCV proviene del portal oficial del Banco Central de Venezuela ([https://www.bcv.org.ve/](https://www.bcv.org.ve/)). Las tasas de Binance y otras fuentes son informativas y no oficiales. Consulta el [Aviso Legal](/legal) para más detalles.
+La información de tasas BCV proviene del portal oficial del Banco Central de Venezuela ([https://www.bcv.org.ve/](https://www.bcv.org.ve/)). Las tasas de Binance son informativas y las puedes consultar directamente en su portal. Consulta el [Aviso Legal](/legal) para más detalles.
 
 ---
 
