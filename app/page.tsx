@@ -392,39 +392,52 @@ export default function HomePage() {
                 className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
                 disabled={loading || (usdExchangeRate === null && binanceSellExchangeRate === null)}
               />
-              <p className="text-base mt-2 mb-1">Equivalente (BCV):</p>
-              <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
-              </p>
-              <div className="flex items-center gap-1 text-base mt-2 mb-1">
-                <p>Equivalente (Binance):</p>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="h-4 w-4 cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent className="bg-popover text-popover-foreground border">
-                      <p>
-                        El precio reflejado incluye la comisión de {BINANCE_COMMISSION_USD.toFixed(3)} USD de Binance.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-2 mt-2">
+                <div>
+                  <p className="text-base mb-1">Equivalente (BCV):</p>
+                  <p className="text-3xl font-extrabold">
+                    {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
+                  </p>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1 text-base mb-1">
+                    <p>Equivalente (Binance):</p>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-popover text-popover-foreground border">
+                          <p>
+                            El precio reflejado incluye la comisión de {BINANCE_COMMISSION_USD.toFixed(3)} USD de
+                            Binance.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <p className="text-3xl font-extrabold">
+                    {bolivaresEquivalentBinance !== null
+                      ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",")
+                      : "0,00"}{" "}
+                    Bs
+                  </p>
+                </div>
+                <div>
+                  <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
+                  <p className="text-3xl font-extrabold">
+                    {absoluteDifferenceBetweenRates !== null
+                      ? absoluteDifferenceBetweenRates.toFixed(2).replace(".", ",")
+                      : "0,00"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-base mt-2 mb-1">Diferencia ($):</p>
+                  <p className="text-3xl font-extrabold">
+                    {differenceInUsd !== null ? differenceInUsd.toFixed(2).replace(".", ",") : "0,00"}
+                  </p>
+                </div>
               </div>
-              <p className="text-3xl font-extrabold">
-                {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}{" "}
-                Bs
-              </p>
-              <p className="text-base mt-2 mb-1">Diferencia (Bs):</p>
-              <p className="text-3xl font-extrabold">
-                {absoluteDifferenceBetweenRates !== null
-                  ? absoluteDifferenceBetweenRates.toFixed(2).replace(".", ",")
-                  : "0,00"}
-              </p>
-              <p className="text-base mt-2 mb-1">Diferencia ($):</p>
-              <p className="text-3xl font-extrabold">
-                {differenceInUsd !== null ? differenceInUsd.toFixed(2).replace(".", ",") : "0,00"}
-              </p>
             </CardContent>
           </Card>
 
