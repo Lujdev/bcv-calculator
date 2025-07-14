@@ -1,11 +1,12 @@
 "use client"
 import { Label } from "@/components/ui/label" // Import Label component
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip" // Import Tooltip components
 
 import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { RefreshCw, CheckCircle2 } from "lucide-react"
+import { RefreshCw, CheckCircle2, Info } from "lucide-react" // Import Info icon
 import { toast } from "sonner"
 
 const BINANCE_COOLDOWN_KEY = "binance_refresh_cooldown_end"
@@ -395,7 +396,21 @@ export default function HomePage() {
               <p className="text-3xl font-extrabold">
                 {bolivaresEquivalentBCV !== null ? bolivaresEquivalentBCV.toFixed(2).replace(".", ",") : "0,00"} Bs
               </p>
-              <p className="text-base mt-2 mb-1">Equivalente (Binance):</p>
+              <div className="flex items-center gap-1 text-base mt-2 mb-1">
+                <p>Equivalente (Binance):</p>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent className="bg-black text-white border-none">
+                      <p>
+                        El precio reflejado incluye la comisión de {BINANCE_COMMISSION_USD.toFixed(3)} USD de Binance.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
               <p className="text-3xl font-extrabold">
                 {bolivaresEquivalentBinance !== null ? bolivaresEquivalentBinance.toFixed(2).replace(".", ",") : "0,00"}{" "}
                 Bs
