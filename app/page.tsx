@@ -55,30 +55,27 @@ export default function HomePage() {
     }, 1000)
   }, [])
 
+  // Modificada para usar la nueva API route
   const fetchUsdEurRates = useCallback(async () => {
     try {
-      const usdResponse = await fetch("https://pydolarve.org/api/v2/tipo-cambio?currency=usd&rounded_price=false")
-      if (!usdResponse.ok) {
-        throw new Error(`HTTP error! status: ${usdResponse.status} for USD`)
+      const response = await fetch("/api/bcv-rates")
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status} for BCV rates`)
       }
-      const usdData = await usdResponse.json()
-      setUsdExchangeRate(usdData.price)
-      setUsdEurLastUpdate(usdData.last_update)
-    } catch (e) {
-      console.error("Error fetching USD exchange rate:", e)
+      const data = await response.json()
+      setUsdExchangeRate(data.usdPrice)
+      setEurExchangeRate(data.eurPrice)
+      setUsdEurLastUpdate(data.lastUpdate)
+    } catch (e: any) {
+      console.error("Error fetching USD/EUR exchange rates:", e.message)
       setUsdExchangeRate(null)
-    }
-
-    try {
-      const eurResponse = await fetch("https://pydolarve.org/api/v2/tipo-cambio?currency=eur&rounded_price=false")
-      if (!eurResponse.ok) {
-        throw new Error(`HTTP error! status: ${eurResponse.status} for EUR`)
-      }
-      const eurData = await eurResponse.json()
-      setEurExchangeRate(eurData.price)
-    } catch (e) {
-      console.error("Error fetching EUR exchange rate:", e)
       setEurExchangeRate(null)
+      toast.error("Error al actualizar tasas BCV", {
+        description: e.message || "No se pudieron obtener las tasas del BCV.",
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
     }
   }, [])
 
@@ -160,8 +157,9 @@ export default function HomePage() {
         }
       }
 
+      // Actualizar tasas BCV cada hora
       usdEurIntervalRef.current = setInterval(fetchUsdEurRates, 3600000)
-      // Actualizar ambas tasas de Binance automáticamente
+      // Actualizar ambas tasas de Binance automáticamente cada hora
       binanceAutoIntervalRef.current = setInterval(async () => {
         try {
           await Promise.all([fetchBinanceSellRate(), fetchBinanceBuyRate()])
