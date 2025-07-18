@@ -6,10 +6,7 @@ export async function POST(request: Request) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // La cabecera 'Cookie' a menudo causa problemas en entornos de servidor o no es necesaria.
-        // Si la API de Binance requiere una cookie específica para cada solicitud,
-        // esto necesitaría una implementación más compleja (ej. gestión de sesiones).
-        // Por ahora, la omitimos.
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       },
       body: JSON.stringify({
         fiat: "VES",
