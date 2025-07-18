@@ -2,53 +2,35 @@ import { NextResponse } from "next/server"
 
 export async function POST(request: Request) {
   try {
-    const response = await fetch("https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search", {
-      method: "POST",
+    const response = await fetch("https://pydolarve.org/api/v2/tipo-cambio?source=binance&currency=usdt&trade_type=buy", {
+      method: "GET",
       headers: {
-        "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
       },
-      body: JSON.stringify({
-        fiat: "VES",
-        page: 1,
-        rows: 5,
-        transAmount: 500, // Monto de transacción especificado en el curl
-        tradeType: "BUY", // Tipo de operación: COMPRA
-        asset: "USDT",
-        countries: [],
-        proMerchantAds: false,
-        shieldMerchantAds: false,
-        filterType: "all",
-        periods: [],
-        additionalKycVerifyFilter: 0,
-        publisherType: "merchant",
-        payTypes: ["PagoMovil"],
-        classifies: ["mass", "profession", "fiat_trade"],
-        tradedWith: false,
-        followed: false,
-      }),
     })
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Binance BUY API error: ${response.status} - ${errorText}`)
+      console.error(`Pydolarve BUY API error: ${response.status} - ${errorText}`)
       return NextResponse.json({ error: `Failed to fetch Binance BUY rate: ${errorText}` }, { status: response.status })
     }
 
     const data = await response.json()
 
-    if (!data || !data.data || data.data.length === 0) {
+    if (!data || typeof data.price === 'undefined') {
       return NextResponse.json({ error: "No data found for Binance BUY rate." }, { status: 404 })
     }
 
-    // Asumiendo que el precio está en el campo 'price' del primer anuncio
-    const price = Number.parseFloat(data.data[0].adv.price)
+    const price = Number.parseFloat(data.price)
 
     if (isNaN(price)) {
       return NextResponse.json({ error: "Invalid price received from Binance BUY API." }, { status: 500 })
     }
 
-    return NextResponse.json({ price })
+    return NextResponse.json({ 
+      price,
+      lastUpdate: data.last_update || null
+    })
   } catch (error: any) {
     console.error("Error in Binance BUY rate route:", error)
     return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 })

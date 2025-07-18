@@ -103,13 +103,18 @@ export default function HomePage() {
       const binanceData = await binanceResponse.json()
       setBinanceSellExchangeRate(binanceData.price)
 
-      const caracasTime = new Date().toLocaleString("es-ES", {
-        timeZone: "America/Caracas",
-        dateStyle: "short",
-        timeStyle: "short",
-        hour12: true,
-      })
-      setBinanceLastUpdate(caracasTime) // La última actualización puede ser compartida
+      // Use the lastUpdate from the API response if available
+      if (binanceData.lastUpdate) {
+        setBinanceLastUpdate(binanceData.lastUpdate)
+      } else {
+        const caracasTime = new Date().toLocaleString("es-ES", {
+          timeZone: "America/Caracas",
+          dateStyle: "short",
+          timeStyle: "short",
+          hour12: true,
+        })
+        setBinanceLastUpdate(caracasTime)
+      }
     } catch (e: any) {
       console.error("Error fetching Binance SELL exchange rate:", e.message)
       setBinanceSellExchangeRate(null)
