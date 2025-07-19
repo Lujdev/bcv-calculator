@@ -23,7 +23,7 @@ export default function AvisoLegal() {
       <section className="bg-white rounded-xl shadow-lg p-6 md:p-8 border border-gray-200">
         <div className="text-center mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-blue-900 mb-2 tracking-tight uppercase">
-            AVISO LEGAL Y EXENCIÓN DE RESPONSABILIDAD - VENEZUELA
+            AVISO LEGAL Y EXENCIÓN DE RESPONSABILIDAD
           </h1>
           <div className="h-1 w-24 bg-blue-700 mx-auto rounded-full"></div>
         </div>
@@ -55,7 +55,7 @@ export default function AvisoLegal() {
             <p>
               Los datos de tasas de cambio proporcionados tienen carácter <strong>meramente informativo y referencial</strong>. 
               Solamente los datos marcados como "BCV" representan tasas oficiales emitidas por el Banco Central de Venezuela. 
-              Las demás tasas son obtenidas de mercados secundarios y fuentes públicas no oficiales.
+              Las demás tasas son obtenidas de mercados secundarios.
             </p>
           </div>
 
@@ -115,7 +115,7 @@ export default function AvisoLegal() {
             </h3>
             <p>
               Este servicio tiene únicamente fines educativos e informativos. <strong>No está asociado</strong> al Gobierno de Venezuela, 
-              al BCV, ni a ninguna entidad financiera regulada por la SUDEBAN. No busca influir en políticas económicas, 
+              al BCV, ni a ninguna entidad financiera. No busca influir en políticas económicas, 
               mercados cambiarios ni comportamientos financieros en Venezuela.
             </p>
           </div>
@@ -123,17 +123,8 @@ export default function AvisoLegal() {
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mt-6">
             <h3 className="font-bold text-yellow-800 mb-1">Declaración de Independencia</h3>
             <p className="text-yellow-700">
-              Esta plataforma es un servicio independiente. No tenemos afiliación, conexión ni respaldo oficial 
-              del Banco Central de Venezuela (BCV), SUDEBAN, ni cualquier entidad gubernamental venezolana.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row justify-between items-center mt-8 pt-4 border-t border-gray-200 text-sm text-gray-500">
-            <p>
-              <strong>Última actualización:</strong> {ultimaActualizacion}
-            </p>
-            <p className="mt-2 sm:mt-0">
-              <strong>Jurisdicción:</strong> República Bolivariana de Venezuela
+              Esta plataforma es un servicio independiente. No tiene afiliación, conexión ni respaldo oficial 
+              del Banco Central de Venezuela (BCV), SUDEBAN, ni cualquier entidad gubernamental.
             </p>
           </div>
         </div>
