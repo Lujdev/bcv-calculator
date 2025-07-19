@@ -21,18 +21,28 @@ export default function HomePage() {
   const [binanceSellExchangeRate, setBinanceSellExchangeRate] = useState<number | null>(null)
   // Nueva variable de estado para la tasa de compra de Binance
   const [binanceBuyExchangeRate, setBinanceBuyExchangeRate] = useState<number | null>(null)
+  // Nueva variable de estado para la tasa de compra de WallyTech Binance
+  const [binanceWallyBuyExchangeRate, setBinanceWallyBuyExchangeRate] = useState<number | null>(null)
 
   const [usdEurLastUpdate, setUsdEurLastUpdate] = useState<string>("")
   const [binanceLastUpdate, setBinanceLastUpdate] = useState<string>("")
+  // Nueva variable de estado para la última actualización de WallyTech Binance
+  const [binanceWallyLastUpdate, setBinanceWallyLastUpdate] = useState<string>("")
   const [usdAmount, setUsdAmount] = useState<string>("")
   const [bsAmount, setBsAmount] = useState<string>("")
+  // Nueva variable de estado para el monto en USD de WallyTech
+  const [wallyUsdAmount, setWallyUsdAmount] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(true)
 
   const [isBinanceRefreshing, setIsBinanceRefreshing] = useState<boolean>(false)
+  // Nueva variable de estado para controlar la actualización de WallyTech Binance
+  const [isBinanceWallyRefreshing, setIsBinanceWallyRefreshing] = useState<boolean>(false)
   const [binanceCooldown, setBinanceCooldown] = useState<number>(0)
   const binanceCooldownIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const usdEurIntervalRef = useRef<NodeJS.Timeout | null>(null)
   const binanceAutoIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  // Nuevo ref para el intervalo de actualización automática de WallyTech Binance
+  const binanceWallyAutoIntervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const [showBinanceLastUpdate, setShowBinanceLastUpdate] = useState(false);
 
@@ -140,12 +150,50 @@ export default function HomePage() {
     }
   }, [])
 
+  // Función para obtener la tasa de COMPRA de WallyTech Binance (tradeType: BUY)
+  const fetchBinanceWallyBuyRate = useCallback(async () => {
+    setIsBinanceWallyRefreshing(true) // Set refreshing to true at the start
+    try {
+      const binanceWallyBuyResponse = await fetch("/api/binance-wally-buy-rate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (!binanceWallyBuyResponse.ok) {
+        const errorData = await binanceWallyBuyResponse.json()
+        throw new Error(errorData.error || `HTTP error! status: ${binanceWallyBuyResponse.status} for Binance Wally Buy`)
+      }
+      const binanceWallyBuyData = await binanceWallyBuyResponse.json()
+      setBinanceWallyBuyExchangeRate(binanceWallyBuyData.price)
+
+      const caracasTime = new Date().toLocaleString("es-ES", {
+        timeZone: "America/Caracas",
+        dateStyle: "short",
+        timeStyle: "short",
+        hour12: true,
+      })
+      setBinanceWallyLastUpdate(caracasTime) // Set last update for WallyTech
+    } catch (e: any) {
+      console.error("Error fetching Binance Wally BUY exchange rate:", e.message)
+      setBinanceWallyBuyExchangeRate(null)
+      toast.error("Error al actualizar WallyTech Binance", {
+        description: e.message || "No se pudo obtener la tasa de WallyTech Binance.",
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
+    } finally {
+      setIsBinanceWallyRefreshing(false) // Set refreshing to false at the end
+    }
+  }, [])
+
   useEffect(() => {
     const initialLoadAndSetupIntervals = async () => {
       setLoading(true)
 
       try {
-        await Promise.all([fetchUsdEurRates(), fetchBinanceSellRate(), fetchBinanceBuyRate()])
+        await Promise.all([fetchUsdEurRates(), fetchBinanceSellRate(), fetchBinanceBuyRate(), fetchBinanceWallyBuyRate()])
       } catch (error) {
         console.error("Error during initial data load:", error)
         // Handle specific errors or show a general error toast if needed
@@ -184,6 +232,24 @@ export default function HomePage() {
           })
         }
       }, 3600000)
+      // Actualizar la tasa de WallyTech Binance automáticamente cada hora
+      binanceWallyAutoIntervalRef.current = setInterval(async () => {
+        try {
+          await fetchBinanceWallyBuyRate()
+          toast.success("Tasa de WallyTech Binance actualizada automáticamente", {
+            description: "La tasa de compra de WallyTech Binance se ha actualizado.",
+            icon: <CheckCircle2 className="h-5 w-5 text-green-400" />,
+            style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+            descriptionClassName: "text-white",
+          })
+        } catch (e: any) {
+          toast.error("Error al actualizar WallyTech Binance automáticamente", {
+            description: e.message || "No se pudo obtener la tasa de WallyTech Binance.",
+            style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+            descriptionClassName: "text-white",
+          })
+        }
+      }, 3600000)
     }
 
     initialLoadAndSetupIntervals()
@@ -198,8 +264,11 @@ export default function HomePage() {
       if (binanceCooldownIntervalRef.current) {
         clearInterval(binanceCooldownIntervalRef.current)
       }
+      if (binanceWallyAutoIntervalRef.current) {
+        clearInterval(binanceWallyAutoIntervalRef.current)
+      }
     }
-  }, [fetchUsdEurRates, fetchBinanceSellRate, fetchBinanceBuyRate, startBinanceCooldown])
+  }, [fetchUsdEurRates, fetchBinanceSellRate, fetchBinanceBuyRate, fetchBinanceWallyBuyRate, startBinanceCooldown])
 
   const handleBinanceRefresh = async () => {
     if (binanceCooldown > 0) {
@@ -229,6 +298,37 @@ export default function HomePage() {
       })
     } finally {
       setIsBinanceRefreshing(false)
+    }
+  }
+
+  const handleBinanceWallyRefresh = async () => {
+    if (binanceCooldown > 0) { // Using the same cooldown for simplicity, could be a separate one
+      toast.info("Espera un momento", {
+        description: `Puedes actualizar en ${binanceCooldown} segundos.`,
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
+      return
+    }
+
+    startBinanceCooldown(60) // Start cooldown for 60 seconds
+    setIsBinanceWallyRefreshing(true)
+    try {
+      await fetchBinanceWallyBuyRate()
+      toast.success("Tasa de WallyTech Binance actualizada", {
+        description: "La tasa de compra de WallyTech Binance se ha actualizado.",
+        icon: <CheckCircle2 className="h-5 w-5 text-green-400" />,
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
+    } catch (e: any) {
+      toast.error("Error al actualizar WallyTech Binance", {
+        description: e.message || "No se pudo obtener la tasa de WallyTech Binance.",
+        style: { backgroundColor: "black", color: "white", border: "1px solid black" },
+        descriptionClassName: "text-white",
+      })
+    } finally {
+      setIsBinanceWallyRefreshing(false)
     }
   }
 
@@ -290,6 +390,19 @@ export default function HomePage() {
     }
     return (parsedBs / binanceBuyExchangeRate).toFixed(2).replace(".", ",")
   }, [bsAmount, binanceBuyExchangeRate])
+
+  // Nueva calculadora para USD en WallyTech a USDT
+  const usdtFromWallyTech = useMemo(() => {
+    const parsedUsd = Number.parseFloat(wallyUsdAmount)
+    if (isNaN(parsedUsd) || binanceWallyBuyExchangeRate === null || binanceWallyBuyExchangeRate === 0) {
+      return "0,00"
+    }
+    // Calculate USDT amount before commission
+    const grossUsdtAmount = parsedUsd / binanceWallyBuyExchangeRate
+    // Subtract commission (BINANCE_COMMISSION_USD is 0.05 USDT)
+    const netUsdtAmount = Math.max(0, grossUsdtAmount - BINANCE_COMMISSION_USD)
+    return netUsdtAmount.toFixed(4).replace(".", ",")
+  }, [wallyUsdAmount, binanceWallyBuyExchangeRate])
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
@@ -378,6 +491,48 @@ export default function HomePage() {
               ) : null}
             </div>
           </Card>
+
+          {/* Tasa de Binance WallyTech Card (New Card) */}
+          <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
+            <CardHeader className="p-0 pb-3 flex flex-row items-center justify-between">
+              <CardTitle className="text-xl font-bold">Tasa de Binance WallyTech</CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleBinanceWallyRefresh}
+                disabled={isBinanceWallyRefreshing || binanceCooldown > 0}
+                className="text-white hover:bg-white/20"
+                aria-label="Actualizar tasa de Binance WallyTech"
+              >
+                {isBinanceWallyRefreshing ? (
+                  <RefreshCw className="h-4 w-4 animate-spin" />
+                ) : binanceCooldown > 0 ? (
+                  <span className="text-xs">{binanceCooldown}s</span>
+                ) : (
+                  <RefreshCw className="h-4 w-4" />
+                )}
+              </Button>
+            </CardHeader>
+            <CardContent className="flex-grow flex flex-col justify-center items-center p-0 text-center">
+              {loading ? (
+                <p className="text-base">Cargando...</p>
+              ) : (
+                <>
+                  <div>
+                    <p className="text-base mb-0.5">1 USDT (WallyTech) es equivalente a:</p>
+                    <p className="text-3xl font-extrabold">
+                      {binanceWallyBuyExchangeRate !== null ? binanceWallyBuyExchangeRate.toFixed(4).replace(".", ",") : "N/A"} USD
+                    </p>
+                  </div>
+                </>
+              )}
+            </CardContent>
+            <div className="text-xs text-right mt-3">
+              {binanceWallyLastUpdate ? (
+                <p>{`Última actualización: ${binanceWallyLastUpdate}`}</p>
+              ) : null}
+            </div>
+          </Card>
         </div>
 
         {/* Contenedor para las Calculadoras (Derecha) */}
@@ -443,6 +598,50 @@ export default function HomePage() {
                   <p className="text-base mt-2 mb-1">Diferencia ($):</p>
                   <p className="text-3xl font-extrabold">
                     {differenceInUsd !== null ? differenceInUsd.toFixed(2).replace(".", ",") : "0,00"}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Calculadora USD en WallyTech a USDT Card (New Card) */}
+          <Card className="bg-gradient-to-br from-blue-darker-start to-blue-darker-end text-white rounded-xl shadow-lg p-4 flex flex-col justify-between min-h-[160px]">
+            <CardHeader className="p-0 pb-3">
+              <CardTitle className="text-xl font-bold">Calculadora USD en WallyTech a USDT</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-grow flex flex-col justify-center p-0">
+              <Label htmlFor="wally-usd-input" className="text-base mb-1">
+                Ingresa el monto en USD (WallyTech):
+              </Label>
+              <Input
+                id="wally-usd-input"
+                type="number"
+                placeholder="Ingresa monto en USD (WallyTech)"
+                value={wallyUsdAmount}
+                onChange={(e) => setWallyUsdAmount(e.target.value)} // Use separate state and setter
+                className="bg-white/20 border-none text-white placeholder:text-white/70 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-darker-start rounded-lg p-2 text-base"
+                disabled={loading || (binanceWallyBuyExchangeRate === null)}
+              />
+              <div className="grid grid-cols-1 gap-y-2 mt-2">
+                <div>
+                  <div className="flex items-center gap-1 text-base mb-1">
+                    <p>Equivalente (USDT):</p>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="bg-popover text-popover-foreground border">
+                          <p>
+                            El precio reflejado incluye la comisión de {BINANCE_COMMISSION_USD.toFixed(3)} USD de
+                            Binance.
+                          </p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <p className="text-3xl font-extrabold">
+                    ${usdtFromWallyTech}
                   </p>
                 </div>
               </div>
